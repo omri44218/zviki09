@@ -3,82 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>דירוגים של הכיתה</title>
+    <title>RANK IT PRO - המערכת המלאה</title>
     <style>
-        :root { --bg: #f3f4f6; --primary: #2563eb; --danger: #ef4444; --success: #10b981; }
+        :root { --bg: #f3f4f6; --primary: #2563eb; --danger: #ef4444; --success: #10b981; --dark: #1e293b; --text-muted: #64748b; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; color: #333; }
-        .nav { background: white; padding: 1rem; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
+        .nav { background: white; padding: 1rem; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
         .container { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
         
-        /* Grid & Cards */
+        /* גריד והצבעות */
         .topics-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
-        .card { background: white; border-radius: 15px; overflow: hidden; border: 1px solid #ddd; cursor: pointer; transition: 0.3s; }
+        .card { background: white; border-radius: 15px; overflow: hidden; border: 1px solid #ddd; cursor: pointer; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .card img { width: 100%; height: 180px; object-fit: cover; }
-        
-        /* Voting Rows */
-        .item-row { display: flex; background: white; border: 3px solid #eee; border-radius: 15px; margin-bottom: 1.2rem; overflow: hidden; transition: 0.3s; }
+        .item-row { display: flex; background: white; border: 3px solid #eee; border-radius: 15px; margin-bottom: 1.2rem; overflow: hidden; }
         .item-row.best { border-color: var(--success); background: #f0fdf4; }
         .item-row.worst { border-color: var(--danger); background: #fef2f2; }
-        
-        .vote-sidebar { padding: 15px; background: #f8fafc; width: 120px; display: flex; flex-direction: column; justify-content: center; border-left: 1px solid #ddd; gap: 8px; }
-        .vote-btn { border: 1px solid #ccc; background: white; padding: 12px 5px; cursor: pointer; border-radius: 10px; font-weight: bold; transition: 0.2s; }
+        .vote-sidebar { padding: 15px; background: #f8fafc; width: 100px; display: flex; flex-direction: column; justify-content: center; border-left: 1px solid #ddd; gap: 8px; }
+        .vote-btn { border: 1px solid #ccc; background: white; padding: 10px 5px; cursor: pointer; border-radius: 10px; font-weight: bold; }
         .vote-btn.active-best { background: var(--success); color: white; border-color: var(--success); }
         .vote-btn.active-worst { background: var(--danger); color: white; border-color: var(--danger); }
-
         .item-img { width: 140px; height: 140px; object-fit: cover; }
+
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1000; overflow-y: auto; }
-        
-        /* User Info Bar */
-        .user-bar { background: #e5e7eb; padding: 8px 15px; border-radius: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
-        .change-name-btn { background: #fff; border: 1px solid #999; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
 
-        /* Admin Styles */
-        input, textarea { width: 100%; padding: 0.8rem; margin: 0.5rem 0; border: 1px solid #ccc; border-radius: 8px; }
-        .stats-table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; font-size: 0.9rem; }
-        .stats-table th, .stats-table td { border: 1px solid #ddd; padding: 12px; text-align: center; }
-        .stats-table th { background: #f8fafc; color: #64748b; }
-        .voter-list { font-size: 0.75rem; color: #666; background: #f1f5f9; padding: 5px; border-radius: 5px; margin-top: 5px; display: none; text-align: right; }
+        /* צ'אט וצוות */
+        .staff-hub { background: var(--dark); color: white; padding: 15px; border-radius: 15px; margin-bottom: 20px; }
+        .chat-box { height: 150px; overflow-y: auto; background: #0f172a; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+        .chat-msg { font-size: 0.85rem; padding: 6px 12px; background: #334155; border-radius: 12px; width: fit-content; }
+        .chat-msg.me { background: var(--primary); align-self: flex-start; }
 
-        /* Role Badge */
-        .role-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; background: #333; color: white; margin-right: 10px; }
-        .admin-only, .editor-only { display: none; }
+        /* טפסים ועריכה */
+        input, textarea { width: 100%; padding: 0.8rem; margin: 0.5rem 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-family: inherit; }
+        .primary { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .opt-entry { border: 2px solid #e2e8f0; padding: 15px; margin-top: 15px; border-radius: 12px; background: #fff; position: relative; }
+        .delete-opt-btn { position: absolute; top: 10px; left: 10px; background: none; border: none; color: var(--danger); cursor: pointer; font-size: 1.2rem; }
+        .stats-table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; border-radius: 8px; overflow: hidden; color: #333; }
+        .stats-table th, .stats-table td { border: 1px solid #eee; padding: 10px; text-align: center; }
+        .help-note { font-size: 0.75rem; color: var(--text-muted); }
     </style>
 </head>
 <body>
 
 <div class="nav">
-    <div style="font-weight: 900; color: var(--primary); font-size: 1.8rem;">RANK IT PRO</div>
+    <div style="font-weight: 900; color: var(--primary); font-size: 1.6rem;">RANK IT PRO</div>
     <div>
-        <span id="role-display" class="role-badge">צופה</span>
-        <button onclick="loginAdmin()" id="admin-login-btn" style="background:#222; color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer;">⚙️ כניסת צוות</button>
-        <button onclick="openAdmin()" id="admin-panel-btn" style="display:none; background:var(--primary); color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer;">🏠 פאנל ניהול</button>
+        <span id="role-display" style="background:#eee; padding:5px 10px; border-radius:15px; font-size:0.8rem;">צופה</span>
+        <button onclick="loginAdmin()" style="border:none; background:none; cursor:pointer;">⚙️</button>
+        <button onclick="openAdmin()" id="admin-btn" style="display:none;" class="primary">🏠 ניהול</button>
     </div>
 </div>
 
-<div class="container" id="main-list">
-    <div class="topics-grid" id="grid"></div>
+<div class="container">
+    <div class="topics-grid" id="main-grid"></div>
 </div>
 
 <div id="admin-modal" class="modal">
     <div class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2>פאנל ניהול <small id="panel-role-text" style="font-size: 0.9rem; color: #666;"></small></h2>
-            <button onclick="closeModals()" style="background:#eee; border:none; padding:10px 20px; border-radius:10px; cursor:pointer;">✕ סגור</button>
-        </div>
-        
-        <div id="editor-section" class="editor-only" style="background: white; padding: 20px; border-radius: 15px; border: 1px solid #ddd; margin-bottom: 30px;">
-            <input type="hidden" id="edit-id">
-            <input type="text" id="cat-title" placeholder="שם הקטגוריה">
-            <textarea id="cat-desc" placeholder="תיאור..."></textarea>
-            <div id="file-wrapper"><input type="file" id="cat-file" accept="image/*"></div>
-            <div id="options-container"></div>
-            <button onclick="addOptionField()" style="background:#f3f4f6; border:1px solid #ddd; padding:10px; border-radius:8px; cursor:pointer; margin-top:10px;">➕ הוסף אופציה</button>
-            <button onclick="saveEverything()" style="background:var(--primary); color:white; width:100%; border:none; padding:15px; margin-top:15px; border-radius:8px; cursor:pointer; font-weight:bold;">שמור נתונים</button>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h2>ניהול ועריכה</h2>
+            <button onclick="closeModals()" style="font-size:1.5rem; border:none; background:none; cursor:pointer;">✕</button>
         </div>
 
-        <h3>דירוגים קיימים</h3>
-        <div id="admin-manage-list"></div>
-        <button onclick="logout()" style="margin-top:20px; background:none; border:none; color:red; cursor:pointer; text-decoration:underline;">התנתק מהמערכת</button>
+        <div id="staff-section" class="staff-hub" style="display:none;">
+            <h3>💬 צ'אט צוות</h3>
+            <div id="chat-box" class="chat-box"></div>
+            <div style="display:flex; gap:8px;">
+                <input type="text" id="chat-input" placeholder="כתוב הודעה..." style="margin:0;">
+                <button onclick="sendChat()" class="primary">שלח</button>
+            </div>
+            <div style="margin-top:10px; font-size:0.8rem; opacity:0.8;">מחוברים כעת: <span id="staff-list"></span></div>
+        </div>
+
+        <div id="editor-section" style="display:none; background:#fff; padding:20px; border:1px solid #ddd; border-radius:15px; margin-bottom:20px;">
+            <h3 id="form-title">יצירת קטגוריה</h3>
+            <input type="hidden" id="edit-id">
+            <input type="text" id="cat-title" placeholder="כותרת קטגוריה">
+            <textarea id="cat-desc" placeholder="תיאור כללי..."></textarea>
+            <label class="help-note">תמונת נושא (העלה להחלפה)</label>
+            <input type="file" id="cat-file" accept="image/*">
+
+            <div id="options-container"></div>
+            <button onclick="addOptionField()" style="width:100%; padding:10px; cursor:pointer; margin-top:10px;">➕ הוסף אופציה לדירוג</button>
+            <button onclick="saveEverything()" class="primary" style="width:100%; margin-top:20px; padding:15px;">💾 שמור באתר</button>
+            <button onclick="resetForm()" style="width:100%; border:none; background:none; color:gray; cursor:pointer;">ביטול</button>
+        </div>
+
+        <h3>רשימת קטגוריות</h3>
+        <div id="admin-items-list"></div>
+        <button onclick="logout()" style="color:red; margin-top:30px; border:none; background:none; cursor:pointer;">התנתק</button>
     </div>
 </div>
 
@@ -88,7 +99,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, where, doc, deleteDoc, updateDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, where, doc, deleteDoc, updateDoc, getDocs, setDoc, serverTimestamp, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAtkpNkT3KAOg3RaXVvJkaChTkMS87VKsM",
@@ -102,57 +113,8 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // --- מערכת הרשאות ---
-    const ROLES = {
-       ADMIN: { id: 'admin', label: 'מנהל מערכת', pass: 'zviki098' },
-        EDITOR: { id: 'editor', label: 'עורך תוכן', pass: 'zviki+' }
-    };
-
-    let currentUserRole = localStorage.getItem('user_role') || 'viewer';
-
-    window.loginAdmin = () => {
-        const pass = prompt("הכנס סיסמת גישה:");
-        if (pass === ROLES.ADMIN.pass) {
-            currentUserRole = 'admin';
-        } else if (pass === ROLES.EDITOR.pass) {
-            currentUserRole = 'editor';
-        } else {
-            alert("סיסמה שגויה");
-            return;
-        }
-        localStorage.setItem('user_role', currentUserRole);
-        applyPermissions();
-    };
-
-    window.logout = () => {
-        localStorage.removeItem('user_role');
-        location.reload();
-    };
-
-    function applyPermissions() {
-        const isAdmin = currentUserRole === 'admin';
-        const isEditor = currentUserRole === 'editor' || isAdmin;
-
-        document.getElementById('role-display').innerText = 
-            isAdmin ? ROLES.ADMIN.label : (isEditor ? ROLES.EDITOR.label : 'צופה');
-        
-        document.getElementById('admin-login-btn').style.display = isEditor ? 'none' : 'inline-block';
-        document.getElementById('admin-panel-btn').style.display = isEditor ? 'inline-block' : 'none';
-        
-        // הצגת אזור העריכה
-        if (isEditor) {
-            const editorSec = document.getElementById('editor-section');
-            if(editorSec) editorSec.style.display = 'block';
-        }
-    }
-    
-    // הפעלה ראשונית של הרשאות
-    applyPermissions();
-
-    // --- סוף מערכת הרשאות ---
-
-    let voterId = localStorage.getItem('voter_id') || Math.random().toString(36).slice(2);
-    localStorage.setItem('voter_id', voterId);
+    let role = localStorage.getItem('user_role') || 'viewer';
+    let voterId = localStorage.getItem('voter_id') || Math.random().toString(36).substring(7);
 
     const resizeImg = (file) => new Promise((res) => {
         const reader = new FileReader(); reader.readAsDataURL(file);
@@ -167,224 +129,202 @@
         };
     });
 
+    window.loginAdmin = () => {
+        const p = prompt("סיסמה:");
+        if (p === 'zviki098') role = 'admin';
+        else if (p === 'zviki+') role = 'editor';
+        else return;
+        localStorage.setItem('user_role', role);
+        location.reload();
+    };
+
+    window.logout = () => { localStorage.removeItem('user_role'); location.reload(); };
+
+    if (role !== 'viewer') {
+        document.getElementById('admin-btn').style.display = 'inline';
+        document.getElementById('editor-section').style.display = 'block';
+        document.getElementById('staff-section').style.display = 'block';
+        document.getElementById('role-display').innerText = role === 'admin' ? 'מנהל' : 'עורך';
+        setDoc(doc(db, "staff_online", voterId), { name: localStorage.getItem('voter_name') || 'איש צוות', time: serverTimestamp() });
+    }
+
+    // צ'אט
+    onSnapshot(query(collection(db, "staff_chat"), orderBy("time", "asc"), limit(50)), (s) => {
+        const b = document.getElementById('chat-box'); b.innerHTML = '';
+        s.forEach(d => { const m = d.data(); b.innerHTML += `<div class="chat-msg ${m.uid===voterId?'me':''}"><b>${m.user}:</b> ${m.text}</div>`; });
+        b.scrollTop = b.scrollHeight;
+    });
+
+    window.sendChat = async () => {
+        const i = document.getElementById('chat-input'); if(!i.value) return;
+        await addDoc(collection(db, "staff_chat"), { text: i.value, user: localStorage.getItem('voter_name') || 'צוות', uid: voterId, time: serverTimestamp() });
+        i.value = '';
+    };
+
+    onSnapshot(collection(db, "staff_online"), (s) => {
+        let n = []; s.forEach(d => n.push(d.data().name)); document.getElementById('staff-list').innerText = n.join(', ');
+    });
+
+    // ניהול אופציות ועריכה
     window.addOptionField = (data = null) => {
         const div = document.createElement('div');
         div.className = "opt-entry";
-        div.style = "background:#fafafa; padding:10px; margin-top:10px; border-radius:8px; border:1px solid #eee;";
         div.innerHTML = `
+            <button class="delete-opt-btn" onclick="removeOptionUI(this, '${data ? data.id : ''}')">🗑️</button>
             <input type="hidden" class="opt-id" value="${data ? data.id : ''}">
             <input type="text" class="opt-name" placeholder="שם האופציה" value="${data ? data.name : ''}">
-            <textarea class="opt-desc" placeholder="תיאור...">${data ? data.desc : ''}</textarea>
-            ${!data ? '<input type="file" class="opt-file" accept="image/*">' : ''}
+            <textarea class="opt-desc" placeholder="תיאור האופציה...">${data ? (data.desc || '') : ''}</textarea>
+            <input type="file" class="opt-file" accept="image/*">
         `;
         document.getElementById('options-container').appendChild(div);
     };
 
-    window.saveEverything = async () => {
-        if (currentUserRole === 'viewer') return alert("אין לך הרשאה לבצע פעולה זו");
-        const title = document.getElementById('cat-title').value;
-        const editId = document.getElementById('edit-id').value;
-        if (!title) return alert("שם קטגוריה חובה");
-
-        if (editId) {
-            await updateDoc(doc(db, "categories", editId), { title, desc: document.getElementById('cat-desc').value });
-            const entries = document.querySelectorAll('.opt-entry');
-            for (let e of entries) {
-                const oId = e.querySelector('.opt-id').value;
-                const oName = e.querySelector('.opt-name').value;
-                if (oId) await updateDoc(doc(db, "options", oId), { name: oName, desc: e.querySelector('.opt-desc').value });
-            }
-            location.reload(); return;
-        }
-
-        const file = document.getElementById('cat-file').files[0];
-        if (!file) return alert("תמונת קטגוריה חובה");
-        const catUrl = await resizeImg(file);
-        const catDoc = await addDoc(collection(db, "categories"), { title, desc: document.getElementById('cat-desc').value, url: catUrl });
-        
-        const entries = document.querySelectorAll('.opt-entry');
-        for (let e of entries) {
-            const oName = e.querySelector('.opt-name').value;
-            const oFile = e.querySelector('.opt-file').files[0];
-            if (oName && oFile) {
-                const oUrl = await resizeImg(oFile);
-                await addDoc(collection(db, "options"), { catId: catDoc.id, name: oName, desc: e.querySelector('.opt-desc').value, url: oUrl, order: Date.now() });
-            }
-        }
-        location.reload();
+    window.removeOptionUI = async (btn, id) => {
+        if (!confirm("למחוק אופציה זו?")) return;
+        if (id) await deleteDoc(doc(db, "options", id));
+        btn.parentElement.remove();
     };
 
-    onSnapshot(collection(db, "categories"), (snap) => {
-        const grid = document.getElementById('grid');
-        const manage = document.getElementById('admin-manage-list');
-        grid.innerHTML = ''; manage.innerHTML = '';
-        snap.forEach(d => {
-            const data = d.data();
-            grid.innerHTML += `<div class="card" onclick="openCategory('${d.id}')"><img src="${data.url}"><div style="padding:15px;"><h3>${data.title}</h3></div></div>`;
-            
-            // כפתורים בניהול לפי הרשאה
-            let adminButtons = `<button onclick="fullEdit('${d.id}')">✏️ ערוך</button>`;
-            
-            if (currentUserRole === 'admin') {
-                adminButtons += `
-                    <button onclick="showStats('${d.id}')" style="background:#10b981; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">📊 סטטיסטיקה</button>
-                    <button onclick="deleteCat('${d.id}')" style="color:red; background:none; border:none; cursor:pointer;">מחק</button>
-                `;
-            }
+    window.saveEverything = async () => {
+        const title = document.getElementById('cat-title').value;
+        const editId = document.getElementById('edit-id').value;
+        const catFile = document.getElementById('cat-file').files[0];
+        if (!title) return alert("חובה שם");
 
-            manage.innerHTML += `
-                <div style="background:white; padding:15px; border-radius:10px; border:1px solid #ddd; margin-bottom:10px;">
-                    <div style="display:flex; justify-content:space-between;">
-                        <strong>${data.title}</strong>
-                        <div>${adminButtons}</div>
+        let updateData = { title, desc: document.getElementById('cat-desc').value };
+        if (catFile) updateData.url = await resizeImg(catFile);
+
+        let finalId = editId;
+        if (editId) await updateDoc(doc(db, "categories", editId), updateData);
+        else {
+            if (!catFile) return alert("חובה תמונה לקטגוריה");
+            const dr = await addDoc(collection(db, "categories"), updateData);
+            finalId = dr.id;
+        }
+
+        for (let e of document.querySelectorAll('.opt-entry')) {
+            const oId = e.querySelector('.opt-id').value;
+            const oName = e.querySelector('.opt-name').value;
+            const oDesc = e.querySelector('.opt-desc').value;
+            const oFile = e.querySelector('.opt-file').files[0];
+            let oData = { name: oName, desc: oDesc, catId: finalId };
+            if (oFile) oData.url = await resizeImg(oFile);
+            if (oId) await updateDoc(doc(db, "options", oId), oData);
+            else if (oName) { oData.order = Date.now(); await addDoc(collection(db, "options"), oData); }
+        }
+        alert("נשמר!"); resetForm();
+    };
+
+    window.resetForm = () => {
+        document.getElementById('edit-id').value = '';
+        document.getElementById('cat-title').value = '';
+        document.getElementById('cat-desc').value = '';
+        document.getElementById('options-container').innerHTML = '';
+        document.getElementById('form-title').innerText = "יצירת קטגוריה";
+    };
+
+    onSnapshot(collection(db, "categories"), (s) => {
+        const g = document.getElementById('main-grid'); const al = document.getElementById('admin-items-list');
+        g.innerHTML = ''; al.innerHTML = '';
+        s.forEach(d => {
+            const data = d.data();
+            g.innerHTML += `<div class="card" onclick="openCategory('${d.id}')"><img src="${data.url}"><div style="padding:10px;"><h3>${data.title}</h3></div></div>`;
+            al.innerHTML += `<div style="background:#fff; padding:15px; border-bottom:2px solid #eee; margin-bottom:10px; border-radius:10px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong>${data.title}</strong>
+                    <div>
+                        <button onclick="fullEdit('${d.id}')">✏️</button>
+                        <button onclick="showStats('${d.id}')" style="background:var(--success); color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">📊</button>
+                        ${role==='admin' ? `<button onclick="deleteCat('${d.id}')" style="color:red;">🗑️</button>` : ''}
                     </div>
-                    <div id="stats-${d.id}" style="display:none; margin-top:15px; border-top:1px solid #eee; padding-top:10px;"></div>
-                </div>`;
+                </div>
+                <div id="stats-${d.id}" style="display:none; margin-top:10px;"></div>
+            </div>`;
         });
     });
 
-    window.fullEdit = async (id) => {
-        const cat = await getDocs(query(collection(db, "categories"), where("__name__", "==", id)));
-        const d = cat.docs[0].data();
-        document.getElementById('edit-id').value = id;
-        document.getElementById('cat-title').value = d.title;
-        document.getElementById('cat-desc').value = d.desc || "";
-        document.getElementById('file-wrapper').style.display = 'none';
-        document.getElementById('options-container').innerHTML = '';
-        const opts = await getDocs(query(collection(db, "options"), where("catId", "==", id)));
-        opts.forEach(o => addOptionField({id: o.id, ...o.data()}));
-    };
-
-    window.showStats = async (id) => {
-        if (currentUserRole !== 'admin') return alert("רק מנהל יכול לראות סטטיסטיקה");
-        const div = document.getElementById(`stats-${id}`);
+    window.showStats = async (catId) => {
+        const div = document.getElementById(`stats-${catId}`);
         div.style.display = div.style.display === 'none' ? 'block' : 'none';
         if (div.style.display === 'block') {
-            div.innerHTML = "טוען נתונים...";
-            const opts = await getDocs(query(collection(db, "options"), where("catId", "==", id)));
-            const votes = await getDocs(query(collection(db, "votes_log"), where("catId", "==", id)));
-            
-            let html = `<table class="stats-table"><tr><th>אופציה</th><th>🏆 טוב</th><th>💩 רע</th><th>פירוט</th></tr>`;
-            opts.forEach(o => {
-                const od = o.data();
-                const bVotes = votes.docs.filter(v => v.data().itemId === o.id && v.data().type === 'best');
-                const wVotes = votes.docs.filter(v => v.data().itemId === o.id && v.data().type === 'worst');
-                
-                html += `<tr>
-                    <td>${od.name}</td>
-                    <td style="color:green; font-weight:bold;">${bVotes.length}</td>
-                    <td style="color:red; font-weight:bold;">${wVotes.length}</td>
-                    <td>
-                        <button style="font-size:0.7rem;" onclick="this.nextElementSibling.style.display='block'">מי הצביע?</button>
-                        <div class="voter-list">
-                            <b>בעד:</b> ${bVotes.map(v => v.data().user).join(', ') || '-'}<br>
-                            <b>נגד:</b> ${wVotes.map(v => v.data().user).join(', ') || '-'}
-                        </div>
-                    </td>
-                </tr>`;
+            const os = await getDocs(query(collection(db, "options"), where("catId", "==", catId)));
+            const vs = await getDocs(query(collection(db, "votes_log"), where("catId", "==", catId)));
+            let h = `<table class="stats-table"><tr><th>פריט</th><th>🏆</th><th>💩</th></tr>`;
+            os.forEach(o => {
+                const b = vs.docs.filter(v => v.data().itemId === o.id && v.data().type === 'best').length;
+                const w = vs.docs.filter(v => v.data().itemId === o.id && v.data().type === 'worst').length;
+                h += `<tr><td>${o.data().name}</td><td>${b}</td><td>${w}</td></tr>`;
             });
-            div.innerHTML = html + `</table>`;
+            div.innerHTML = h + `</table>`;
         }
     };
 
-    window.deleteCat = async (id) => { 
-        if (currentUserRole !== 'admin') return alert("אין לך הרשאה למחוק");
-        if(confirm("למחוק?")) await deleteDoc(doc(db, "categories", id)); 
+    window.fullEdit = async (id) => {
+        const s = await getDocs(query(collection(db, "categories"), where("__name__", "==", id)));
+        const d = s.docs[0].data();
+        document.getElementById('edit-id').value = id;
+        document.getElementById('cat-title').value = d.title;
+        document.getElementById('cat-desc').value = d.desc || '';
+        document.getElementById('form-title').innerText = "עריכת: " + d.title;
+        document.getElementById('options-container').innerHTML = '';
+        const os = await getDocs(query(collection(db, "options"), where("catId", "==", id)));
+        os.forEach(o => addOptionField({id: o.id, ...o.data()}));
+        document.getElementById('admin-modal').scrollTop = 0;
     };
 
-    window.openCategory = (catId) => {
-        let name = localStorage.getItem('voter_name');
-        if (!name) {
-            name = prompt("הכנס שם לדירוג (חד-פעמי):");
-            if (!name) return;
-            localStorage.setItem('voter_name', name);
-        }
+    window.deleteCat = async (id) => { if(confirm("למחוק הכל?")) await deleteDoc(doc(db, "categories", id)); };
+
+    // הצבעות
+    window.openCategory = (id) => {
+        let n = localStorage.getItem('voter_name');
+        if (!n) { n = prompt("שם:"); if (!n) return; localStorage.setItem('voter_name', n); }
         document.getElementById('view-modal').style.display = 'block';
-
-        onSnapshot(doc(db, "categories", catId), (d) => {
+        onSnapshot(doc(db, "categories", id), (d) => {
             const cat = d.data();
-            const header = `
-                <div class="user-bar">
-                    <span>מצביע כ: <b>${localStorage.getItem('voter_name')}</b></span>
-                    <button class="change-name-btn" onclick="changeName('${catId}')">שינוי שם</button>
-                </div>
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <h1>${cat.title}</h1><button onclick="closeModals()">✕ סגור</button>
-                </div><p>${cat.desc || ''}</p>`;
-            
-            onSnapshot(query(collection(db, "options"), where("catId", "==", catId)), (snap) => {
-                let items = []; snap.forEach(od => items.push({id: od.id, ...od.data()}));
-                items.sort((a,b) => a.order - b.order);
-
-                let listHtml = '';
-                items.forEach(item => {
-                    listHtml += `
-                        <div class="item-row" id="row-${item.id}">
-                            <div class="vote-sidebar">
-                                <button class="vote-btn best-btn" onclick="vote('${catId}','${item.id}','best')">🏆 טוב</button>
-                                <button class="vote-btn worst-btn" onclick="vote('${catId}','${item.id}','worst')">💩 רע</button>
-                            </div>
-                            <div style="flex:1; padding:15px;"><h3>${item.name}</h3><p>${item.desc || ''}</p></div>
-                            <img src="${item.url}" class="item-img">
-                        </div>`;
+            onSnapshot(query(collection(db, "options"), where("catId", "==", id)), (snap) => {
+                let h = `<div style="display:flex; justify-content:space-between; align-items:center;"><h1>${cat.title}</h1><button onclick="closeModals()" style="font-size:2rem; border:none; background:none; cursor:pointer;">✕</button></div><p>${cat.desc||''}</p>`;
+                let items = []; snap.forEach(o => items.push({id: o.id, ...o.data()}));
+                items.sort((a,b)=>a.order-b.order).forEach(item => {
+                    h += `<div class="item-row" id="row-${item.id}">
+                        <div class="vote-sidebar">
+                            <button class="vote-btn best-btn" onclick="vote('${id}','${item.id}','best')">🏆</button>
+                            <button class="vote-btn worst-btn" onclick="vote('${id}','${item.id}','worst')">💩</button>
+                        </div>
+                        <div style="flex:1; padding:15px;"><h3>${item.name}</h3><p style="font-size:0.85rem; color:#666;">${item.desc||''}</p></div>
+                        <img src="${item.url}" class="item-img">
+                    </div>`;
                 });
-                document.getElementById('view-content').innerHTML = header + listHtml;
-                updateVoteUI(catId);
+                document.getElementById('view-content').innerHTML = h; updateVoteUI(id);
             });
         });
     };
 
-    window.changeName = (catId) => {
-        let newName = prompt("הכנס שם חדש:", localStorage.getItem('voter_name'));
-        if (newName) {
-            localStorage.setItem('voter_name', newName);
-            openCategory(catId);
+    window.vote = async (cid, iid, type) => {
+        const q = query(collection(db, "votes_log"), where("voterId", "==", voterId), where("catId", "==", cid), where("type", "==", type));
+        const s = await getDocs(q); for (let d of s.docs) await deleteDoc(doc(db, "votes_log", d.id));
+        if (s.docs.length === 0 || s.docs[0].data().itemId !== iid) {
+            await addDoc(collection(db, "votes_log"), { voterId, catId: cid, itemId: iid, type, user: localStorage.getItem('voter_name'), time: Date.now() });
+            const oq = query(collection(db, "votes_log"), where("voterId", "==", voterId), where("itemId", "==", iid), where("type", "==", type==='best'?'worst':'best'));
+            const os = await getDocs(oq); for (let d of os.docs) await deleteDoc(doc(db, "votes_log", d.id));
         }
+        updateVoteUI(cid);
     };
 
-    window.vote = async (catId, itemId, type) => {
-        const q = query(collection(db, "votes_log"), where("voterId", "==", voterId), where("catId", "==", catId), where("type", "==", type));
-        const existing = await getDocs(q);
-        
-        for (let d of existing.docs) await deleteDoc(doc(db, "votes_log", d.id));
-
-        if (existing.docs.length === 0 || existing.docs[0].data().itemId !== itemId) {
-            await addDoc(collection(db, "votes_log"), {
-                voterId, catId, itemId, type, user: localStorage.getItem('voter_name'), time: Date.now()
-            });
-            const otherType = type === 'best' ? 'worst' : 'best';
-            const otherQ = query(collection(db, "votes_log"), where("voterId", "==", voterId), where("catId", "==", catId), where("itemId", "==", itemId), where("type", "==", otherType));
-            const otherExisting = await getDocs(otherQ);
-            for (let d of otherExisting.docs) await deleteDoc(doc(db, "votes_log", d.id));
-        }
-        updateVoteUI(catId);
-    };
-
-    async function updateVoteUI(catId) {
-        const votes = await getDocs(query(collection(db, "votes_log"), where("voterId", "==", voterId), where("catId", "==", catId)));
+    async function updateVoteUI(cid) {
+        const s = await getDocs(query(collection(db, "votes_log"), where("voterId", "==", voterId), where("catId", "==", cid)));
         document.querySelectorAll('.item-row').forEach(r => r.className = 'item-row');
-        document.querySelectorAll('.vote-btn').forEach(b => b.className = b.className.replace(' active-best', '').replace(' active-worst', ''));
-        
-        votes.forEach(v => {
-            const d = v.data();
-            const row = document.getElementById(`row-${d.itemId}`);
-            if (row) {
-                row.classList.add(d.type);
-                row.querySelector('.' + d.type + '-btn').classList.add('active-' + d.type);
-            }
+        document.querySelectorAll('.vote-btn').forEach(b => b.classList.remove('active-best', 'active-worst'));
+        s.forEach(v => {
+            const d = v.data(); const r = document.getElementById(`row-${d.itemId}`);
+            if(r) { r.classList.add(d.type); r.querySelector('.'+d.type+'-btn').classList.add('active-'+d.type); }
         });
     }
 
-    window.openAdmin = () => {
-        document.getElementById('admin-modal').style.display = 'block';
-        document.getElementById('panel-role-text').innerText = `(מחובר בתור: ${currentUserRole})`;
-    };
-    
-    window.closeModals = () => { 
-        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); 
-        // לא מרעננים כדי לא לאבד את ה-Login
-    };
+    window.openAdmin = () => document.getElementById('admin-modal').style.display = 'block';
+    window.closeModals = () => document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+    window.fullEdit = fullEdit; window.deleteCat = deleteCat; window.showStats = showStats; 
+    window.openCategory = openCategory; window.vote = vote; window.addOptionField = addOptionField; 
+    window.saveEverything = saveEverything; window.sendChat = sendChat; window.resetForm = resetForm; window.removeOptionUI = removeOptionUI;
 </script>
 </body>
-
 </html>
